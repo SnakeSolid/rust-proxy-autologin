@@ -9,6 +9,7 @@ use crate::options::Options;
 use chrono::offset::Local;
 use cron::Schedule;
 use reqwest::blocking::ClientBuilder;
+use reqwest::redirect::Policy;
 use std::error::Error;
 use std::str::FromStr;
 use std::thread;
@@ -22,6 +23,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let schedule = Schedule::from_str(options.cron())?;
     let client = ClientBuilder::new()
         .timeout(Duration::from_secs(10))
+        .redirect(Policy::none())
         .danger_accept_invalid_certs(true)
         .build()?;
     let checker = ProxyChecker::new(&options, &client);

@@ -59,7 +59,8 @@ impl<'a> ProxyChecker<'a> {
         let response = self.client.post(location).form(&params).send()?;
         let status = response.status();
 
-        if status.is_success() || status.is_redirection() {
+        // If login was successful proxy must redirect to original location.
+        if status.is_redirection() {
             info!("Authorization complete");
 
             Ok(LoginStatus::Success)
@@ -70,8 +71,9 @@ impl<'a> ProxyChecker<'a> {
 
     fn detect_proxy(&self) -> Result<CheckStatus, Box<dyn Error>> {
         let response = self.client.get(self.detect_url).send()?;
+        let status = response.status();
 
-        if response.status().is_redirection() {
+        if status.is_redirection() {
             if let Some(location) = response
                 .headers()
                 .iter()
