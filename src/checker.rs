@@ -6,30 +6,44 @@ use std::error::Error;
 use std::thread;
 use std::time::Duration;
 
+/// Checker used to check authorization status and send authorization request to proxy.
 #[derive(Debug)]
 pub struct ProxyChecker<'a> {
+    /// URL to detect proxy status. Usually URL to some HTTP:// resource.
     detect_url: &'a str,
+    /// Login used for proxy authorization
     login: &'a str,
+    /// Password used for proxy authorization
     pass: &'a str,
+    /// Number of retries if authorization failed.
     error_retry: usize,
+    /// Interval between retries (in seconds) if authorization failed.
     error_interval: Duration,
     client: &'a Client,
 }
 
+/// Proxy check status
 #[derive(Debug)]
 enum CheckStatus {
+    /// Status success if no authorization required by proxy.
     Success,
+    /// Correct redirection to authorization page.
     Redirect(String),
+    /// Response contains redirection status, but header `location` not found.
     RedirectError,
 }
 
+/// Authorization status
 #[derive(Debug)]
 enum LoginStatus {
+    /// Authorization successfully complete.
     Success,
+    /// Authorization failed, login request does not contain redirection.
     Failed,
 }
 
 impl<'a> ProxyChecker<'a> {
+    /// Create new instance of checker using options and prepared `Client`:
     pub fn new<'p>(options: &'p Options, client: &'p Client) -> ProxyChecker<'p> {
         ProxyChecker {
             detect_url: options.detect_url(),
@@ -41,6 +55,8 @@ impl<'a> ProxyChecker<'a> {
         }
     }
 
+    /// Check authorization status and login if it's necessarily. Returns `true` on success, and `false` if login
+    /// failed after `error_retry` number of retries.
     pub fn check_auth(&self) -> bool {
         // Proxy check loop, repeat check 10 times on fail.
         for _ in 0..self.error_retry {
@@ -94,6 +110,9 @@ impl<'a> ProxyChecker<'a> {
         }
     }
 
+    /// Try to detect proxy using redirection status and location HTTP header. If GET request to given URL returns
+    /// redirection to some location (corporative proxy usually change HTTP:// protocol), then return this location
+    /// as authorization page.
     fn detect_proxy(&self) -> Result<CheckStatus, Box<dyn Error>> {
         let response = self.client.get(self.detect_url).send()?;
         let status = response.status();
