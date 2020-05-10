@@ -25,6 +25,18 @@ Optional arguments:
 * `-d` (`--detect-url`): Detect portal URL address, default = `http://detectportal.firefox.com/success.txt`;
 * `-i` (`--error-interval`): Interval between retries when error occurred, default = 300;
 * `-r` (`--error-retry`): Number of retries when error occurred, default = 3;
+* `-n` (`--now`): Authorize immediately after start without stopping scheduled checks;
 * `-h` (`--help`): Show help and exit.
+
+Environment variables:
+
+* `AUTOLOGIN_CRON`: variable value will be used if argument `--cron` not given;
+* `AUTOLOGIN_DETECT_URL`: variable value will be used if argument `--detect-url` not given;
+* `AUTOLOGIN_ERROR_INTERVAL`: variable value will be used if argument `--error-interval` not given;
+* `AUTOLOGIN_ERROR_RETRY`: variable value will be used if argument `--error-retry` not given;
+* `AUTOLOGIN_LOGIN`: variable value will be used if argument `--login` not given;
+* `AUTOLOGIN_PASS`: variable value will be used if argument `--pass` not given;
+
+Command line options have higher priority than environment variables.
 
 Logs will be shown when environment variable `RUST_LOG=info` given.
