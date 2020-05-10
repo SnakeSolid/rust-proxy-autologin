@@ -3,29 +3,25 @@ use structopt::StructOpt;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "pgrestore-web")]
 pub struct Options {
-    #[structopt(
-        short = "l",
-        long = "login",
-        name = "LOGIN",
-        env = "AUTOLOGIN_LOGIN",
-        help = "Proxy login"
-    )]
+    #[structopt(short, long, env = "AUTOLOGIN_LOGIN", help = "Proxy login")]
     login: String,
 
     #[structopt(
-        short = "p",
-        long = "pass",
-        name = "PASS",
+        short,
+        long,
         env = "AUTOLOGIN_PASS",
         hide_env_values = true,
         help = "Proxy password"
     )]
     pass: String,
 
+    #[structopt(short, long, help = "Authorize immediately after start")]
+    now: bool,
+
     #[structopt(
-        short = "d",
-        long = "detect-url",
-        name = "DETECT_URL",
+        short,
+        long,
+        name = "url",
         env = "AUTOLOGIN_DETECT_URL",
         help = "Detect proxy URL",
         default_value = "http://detectportal.firefox.com/success.txt"
@@ -33,9 +29,8 @@ pub struct Options {
     detect_url: String,
 
     #[structopt(
-        short = "c",
-        long = "cron",
-        name = "CRON",
+        short,
+        long,
         env = "AUTOLOGIN_CRON",
         help = "Cron expression to check proxy connection",
         default_value = "0 0 6 * * mon-fri *"
@@ -44,8 +39,8 @@ pub struct Options {
 
     #[structopt(
         short = "i",
-        long = "error-interval",
-        name = "INTERVAL",
+        long,
+        name = "interval",
         env = "AUTOLOGIN_ERROR_INTERVAL",
         help = "Interval between checks on error (seconds)",
         default_value = "300"
@@ -54,8 +49,8 @@ pub struct Options {
 
     #[structopt(
         short = "r",
-        long = "error-retry",
-        name = "RETRY",
+        long,
+        name = "reties",
         env = "AUTOLOGIN_ERROR_RETRY",
         help = "Number of checks on error",
         default_value = "3"
@@ -70,6 +65,10 @@ impl Options {
 
     pub fn pass(&self) -> &str {
         &self.pass
+    }
+
+    pub fn now(&self) -> bool {
+        self.now
     }
 
     pub fn detect_url(&self) -> &str {

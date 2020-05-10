@@ -3,12 +3,16 @@ use reqwest::blocking::Client;
 use reqwest::header;
 use std::collections::HashMap;
 use std::error::Error;
+use std::thread;
+use std::time::Duration;
 
 #[derive(Debug)]
 pub struct ProxyChecker<'a> {
     detect_url: &'a str,
     login: &'a str,
     pass: &'a str,
+    error_retry: usize,
+    error_interval: Duration,
     client: &'a Client,
 }
 
@@ -31,11 +35,32 @@ impl<'a> ProxyChecker<'a> {
             detect_url: options.detect_url(),
             login: options.login(),
             pass: options.pass(),
+            error_retry: options.error_retry(),
+            error_interval: Duration::from_secs(options.error_interval()),
             client,
         }
     }
 
-    pub fn ensure_auth(&self) -> Result<(), Box<dyn Error>> {
+    pub fn check_auth(&self) -> bool {
+        // Proxy check loop, repeat check 10 times on fail.
+        for _ in 0..self.error_retry {
+            info!("Checking proxy authorization status");
+
+            match self.ensure_auth() {
+                Ok(()) => return true,
+                Err(err) => {
+                    warn!("Failed to check proxy status: {}", err);
+                    info!("Sleep for {} seconds", self.error_interval.as_secs());
+
+                    thread::sleep(self.error_interval);
+                }
+            }
+        }
+
+        false
+    }
+
+    fn ensure_auth(&self) -> Result<(), Box<dyn Error>> {
         let status = self.detect_proxy()?;
 
         match status {

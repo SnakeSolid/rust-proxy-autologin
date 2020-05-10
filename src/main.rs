@@ -30,6 +30,12 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     info!("Starting proxy check");
 
+    if options.now() {
+        info!("Trying to authorize immediately");
+
+        checker.check_auth();
+    }
+
     for datetime in schedule.upcoming(Local) {
         info!("Next check at {}", datetime);
 
@@ -42,20 +48,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             thread::sleep(duration.to_std()?);
         }
 
-        // Proxy check loop, repeat check 10 times on fail.
-        for _ in 0..options.error_retry() {
-            info!("Checking proxy authorization status");
-
-            match checker.ensure_auth() {
-                Ok(()) => break,
-                Err(err) => {
-                    warn!("Failed to check proxy status: {}", err);
-                    info!("Sleep for {} seconds", options.error_interval());
-
-                    thread::sleep(Duration::from_secs(options.error_interval()));
-                }
-            }
-        }
+        checker.check_auth();
     }
 
     unreachable!()
