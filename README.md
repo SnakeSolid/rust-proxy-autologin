@@ -26,6 +26,7 @@ Optional arguments:
 * `-i` (`--error-interval`): Interval between retries when error occurred, default = 300;
 * `-r` (`--error-retry`): Number of retries when error occurred, default = 3;
 * `-n` (`--now`): Authorize immediately after start without stopping scheduled checks;
+* `-t` (`--timeout`): HTTP connection timeout in seconds, default = 30;
 * `-h` (`--help`): Show help and exit.
 
 Environment variables:
@@ -36,6 +37,7 @@ Environment variables:
 * `AUTOLOGIN_ERROR_RETRY`: variable value will be used if argument `--error-retry` not given;
 * `AUTOLOGIN_LOGIN`: variable value will be used if argument `--login` not given;
 * `AUTOLOGIN_PASS`: variable value will be used if argument `--pass` not given;
+* `AUTOLOGIN_TIMEOUT`: variable value will be used if argument `--timeout` not given;
 
 Command line options have higher priority than environment variables.
 
