@@ -22,7 +22,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let options = Options::from_args();
     let schedule = Schedule::from_str(options.cron())?;
     let client = ClientBuilder::new()
-        .timeout(Duration::from_secs(10))
+        .timeout(Duration::from_secs(options.timeout()))
         .redirect(Policy::none())
         .danger_accept_invalid_certs(true)
         .build()?;

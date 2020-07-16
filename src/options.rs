@@ -56,6 +56,16 @@ pub struct Options {
         default_value = "3"
     )]
     error_retry: usize,
+
+    #[structopt(
+        short = "t",
+        long,
+        name = "timeout",
+        env = "AUTOLOGIN_TIMEOUT",
+        help = "HTTP timeout (seconds)",
+        default_value = "30"
+    )]
+    timeout: u64,
 }
 
 impl Options {
@@ -85,5 +95,9 @@ impl Options {
 
     pub fn error_retry(&self) -> usize {
         self.error_retry
+    }
+
+    pub fn timeout(&self) -> u64 {
+        self.timeout
     }
 }
